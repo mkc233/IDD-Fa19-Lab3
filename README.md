@@ -255,7 +255,7 @@ void setupLED()
 
 **a. Does it matter what actions are assigned to which state? Why?**
 
-Yes the cases matter otherwise you could delete the EEPROM before you are going to read to it.
+It does not matter which action is mapped to which state, as long as you program the arduino to use the proper order of states.  However in this instance it does, otherwise you could clear inbetween writing and then reading.
 
 **b. Why is the code here all in the setup() functions and not in the loop() functions?**
 
@@ -266,14 +266,48 @@ The code is all in the setup because you just want to do a one time read and wri
 The Atmega328 can store 1024 bytes of data.  
 
 **d. How would you get analog data from the Arduino analog pins to be byte-sized? How about analog data from the I2C devices?**
-
+Analgo data from the Atmega328 comes in 10 bit, since one byye is 8 bits, we can divide the 10 bits by 4 to get the 8 bit value.  Similar for I2C devices that are in 10 bits.
 
 **e. Alternately, how would we store the data if it were bigger than a byte? (hint: take a look at the [EEPROMPut](https://www.arduino.cc/en/Reference/EEPROMPut) example)**
 
+We could split up the data and store it in mutiple areas, and then read out the list of the two areas together to get the value.
+
 **Upload your modified code that takes in analog values from your sensors and prints them back out to the Arduino Serial Monitor.**
 
+State 2 was changed to read from the photocell and print out the values on the serial monitor.
+
+```
+
+const int analogInPin = A5;
+int sensorValue = 0;
+
+int endAddr;
+
+void state2Setup() {
+  digitalWrite(ledPin, LOW);
+  Serial.println("Writing to EEPROM");
+  sensorValue = analogRead(analogInPin);
+  //if any of the pin settings for the different states differed for the different states, you could change those settings here.
+  endAddr = min(sensorValue, EEPROMSIZE);
+  for (int i = 0; i < endAddr; i++) {
+    EEPROM.write(i, sensorValue);
+  }
+
+  Serial.println("String committed to EEPROM!");
+}
+
+void state2Loop() {
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+}
+
+void doState2() {
+  if (lastState != 2) state2Setup();
+  state2Loop();
+}
+```
+
 ### 2. Design your logger
- 
+
 **a. Insert here a copy of your final state diagram.**
 
 ### 3. Create your data logger!

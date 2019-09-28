@@ -22,7 +22,7 @@ It has 10 bits of resolution.
 
 **How might you use this with only the parts in your kit? Show us your solution.**
 
-RGB Led https://youtu.be/TE2PnILHgLc
+[RGB Led](https://youtu.be/TE2PnILHgLc)
 
 ## Part C. Voltage Varying Sensors 
  
@@ -310,6 +310,7 @@ void doState2() {
 ### 2. Design your logger
 
 **a. Insert here a copy of your final state diagram.**
+[State Diagram](
 
 ### 3. Create your data logger!
  

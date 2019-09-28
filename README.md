@@ -255,11 +255,18 @@ void setupLED()
 
 **a. Does it matter what actions are assigned to which state? Why?**
 
+Yes the cases matter otherwise you could delete the EEPROM before you are going to read to it.
+
 **b. Why is the code here all in the setup() functions and not in the loop() functions?**
+
+The code is all in the setup because you just want to do a one time read and write, you don't want it to continuosly run and keep reading and writing, that would make it a not very good data logger.
 
 **c. How many byte-sized data samples can you store on the Atmega328?**
 
+The Atmega328 can store 1024 bytes of data.  
+
 **d. How would you get analog data from the Arduino analog pins to be byte-sized? How about analog data from the I2C devices?**
+
 
 **e. Alternately, how would we store the data if it were bigger than a byte? (hint: take a look at the [EEPROMPut](https://www.arduino.cc/en/Reference/EEPROMPut) example)**
 

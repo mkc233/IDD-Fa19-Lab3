@@ -249,10 +249,6 @@ void setupLED()
 }
 ```
 
-## Optional. Graphic Display
-
-**Take a picture of your screen working insert it here!**
-
 ## Part D. Logging values to the EEPROM and reading them back
  
 ### 1. Reading and writing values to the Arduino EEPROM

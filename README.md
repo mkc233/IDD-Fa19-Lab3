@@ -315,3 +315,197 @@ void doState2() {
 ### 3. Create your data logger!
  
 **a. Record and upload a short demo video of your logger in action.**
+
+This logs how which button was held down longer and writes that information to the EEPROM.  When the information is read, it lights up the corresponding LED with whichever button was held down longer.
+
+[Custom Data Logger](https://youtu.be/FyRLKFrQYAg)
+
+Main
+```
+/*
+  basic state machine 2
+ 
+  Modified to switch between states to write, read and clear EEPROM
+ 
+ Demonstrates how to use a case statement to create a simple state machine.
+ This code uses a potentiometer knob to select between 3 states.
+ 
+ The circuit:
+ * pot from analog in 0 to +5V
+ * 10K resistor from analog in 0 to ground
+ 
+ created 13 Apr 2010
+ by Wendy Ju 
+ modified from switchCase by Tom Igoe
+ 
+ 12 Sep 2018
+ Modified to switch between states to write, read and clear EEPROM
+ */
+
+#include <EEPROM.h>
+
+const int player1 = 10;
+const int player2 = 9;
+const int p1LED = 7;
+const int p2LED = 6;
+const int reset = 5;
+int p1buttonValue = 0;
+int p2buttonValue = 0;
+int p1presses = 0;
+int p2presses = 0;
+int resetbutton = 0;
+
+
+const int numStates = 3;
+const int sensorMin =0;
+const int sensorMax = 1024;
+const int EEPROMSIZE=1024;
+
+int sensorPin = 0;    // select the input pin for the potentiometer
+int ledPin = LED_BUILTIN;    
+int state,lastState = -1;
+
+void setup() {
+  // initialize serial communication:
+  pinMode(player1,INPUT_PULLUP);
+  pinMode(player2, INPUT_PULLUP);
+  pinMode(reset,INPUT_PULLUP);
+  Serial.begin(9600);  
+  pinMode(ledPin, OUTPUT);  
+}
+
+void loop() {
+  // map the pot range to number of states :
+
+  p1buttonValue = digitalRead(player1);
+  p2buttonValue = digitalRead(player2);
+  resetbutton = digitalRead(reset);
+
+    if(resetbutton == 0){
+    p1presses = 0;
+    p2presses = 0;
+  }
+
+  if (p1buttonValue == 0){
+    p1presses = p1presses + 1; 
+  }
+
+  if(p2buttonValue ==0){
+    p2presses = p2presses + 1;
+  }
+  state = map(analogRead(sensorPin), sensorMin, sensorMax, 0, numStates);
+
+  // do something different depending on the 
+  // range value:
+  switch (state) {
+  case 0:    
+    doState0();
+    break;
+  case 1:    
+    doState1();
+    break;
+  case 2:    
+    doState2();
+    break;
+  } 
+  lastState = state;
+}
+```
+state 0
+```
+// This borrows code from Examples->EEPROM->eeprom_clear
+
+void state0Setup() {
+  digitalWrite(ledPin, LOW);
+  Serial.println("Clearing EEPROM");
+  //if any of the pin settings for the different states differed for the different states, you could change those settings here.
+  for (int i = 0; i < EEPROMSIZE; i++) {
+    EEPROM.write(i, 0);
+  }
+
+  // turn the LED on when we're done
+  Serial.println("EEPROM cleared");
+}
+
+void state0Loop() {
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+}
+
+void doState0() {
+  if (lastState != 0) { state0Setup(); }
+  state0Loop();
+}
+```
+state 1
+```
+// This borrows code from Examples->EEPROM->eeprom_read
+
+byte value;
+
+void state1Setup() {
+  Serial.println("Reading from EEPROM");
+
+    value = EEPROM.read(0);
+    Serial.print(value);
+    
+    if(value == 0){
+      digitalWrite(7,HIGH);
+      digitalWrite(6,LOW);
+  }
+    else if(value == 1){
+      digitalWrite(7,LOW);
+      digitalWrite(6,HIGH);
+    }
+    else if(value == 2){
+      digitalWrite(7,LOW);
+      digitalWrite(6,LOW);
+    }
+  
+  Serial.println();
+
+  Serial.println("Done reading from EEPROM");
+}
+
+void state1Loop() {
+  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+}
+
+void doState1() {
+  if (lastState != 1) { state1Setup(); }
+  state1Loop();
+}
+```
+state 2
+```
+// This borrows code from Examples->EEPROM->eeprom_write
+
+
+void state2Setup() {
+  digitalWrite(ledPin, LOW);
+  Serial.println("Writing to EEPROM");
+  
+  //if any of the pin settings for the different states differed for the different states, you could change those settings here.
+  if (p1presses > p2presses){
+    EEPROM.write(0,0);
+  }
+  else if(p1presses < p2presses){
+      EEPROM.write(0,1);
+    }
+  else if(p1presses == p2presses){
+    EEPROM.write(0,2);
+  }
+  
+  Serial.println("String committed to EEPROM!");
+}
+
+void state2Loop() {
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+}
+
+void doState2() {
+  if (lastState != 2) state2Setup();
+  state2Loop();
+}
+```
+
+

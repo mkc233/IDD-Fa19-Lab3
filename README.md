@@ -22,6 +22,7 @@ It has 10 bits of resolution.
 
 **How might you use this with only the parts in your kit? Show us your solution.**
 
+RGB Led https://youtu.be/TE2PnILHgLc
 
 ## Part C. Voltage Varying Sensors 
  
